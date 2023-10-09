@@ -2,6 +2,7 @@
     THis file is for the definition of all the function used in the main program.
 """
 import numpy as np
+import parameters as paras
 
 def trial(x):
     return x + 1
@@ -11,5 +12,5 @@ def trial(x):
 """
 
 def func1(phi):
-    return Hhat*phi#just a idea how the function works, not working indeed.
+    return paras.Hhat*phi#just a idea how the function works, not working indeed.
     
