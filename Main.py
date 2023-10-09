@@ -5,3 +5,13 @@ print("Hello world!")
     Compare this with OBE mode to see the differences.
     
 """
+import matplotlib.pyplot as plt
+import functions as func
+import parameters as para
+import numpy as np
+
+
+x = 3
+x = func.trial(x)
+print(x)
+print(para.Hhat)
