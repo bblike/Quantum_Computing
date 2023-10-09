@@ -9,3 +9,7 @@ def trial(x):
 """
     new ideas: use /phi as parameters and take Hhat as the function calculation.
 """
+
+def func1(phi):
+    return Hhat*phi#just a idea how the function works, not working indeed.
+    
