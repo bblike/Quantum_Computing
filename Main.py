@@ -15,3 +15,5 @@ x = 3
 x = func.trial(x)
 print(x)
 print(para.Hhat)
+test = func.func1(para.phi)
+print(test)
