@@ -12,5 +12,5 @@ def trial(x):
 """
 
 def func1(phi):
-    return paras.Hhat*phi#just a idea how the function works, not working indeed.
+    return paras.hat*phi#just a idea how the function works, not working indeed.
     
