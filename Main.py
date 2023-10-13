@@ -10,10 +10,8 @@ import functions as func
 import parameters as para
 import numpy as np
 
+x = para.init
+a = func.random_value()
+print(a)
 
-x = 3
-x = func.trial(x)
-print(x)
-print(para.hat)
-test = func.func1(para.phi)
-print(test)
+
