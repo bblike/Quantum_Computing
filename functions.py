@@ -4,6 +4,7 @@
 import numpy as np
 import parameters as paras
 import random
+import cmath
 
 def trial(x):
     return x + 1
@@ -30,7 +31,7 @@ def tri(phi):
 #one time revolution at time t
 def revolution(phi, t):
     density = density_matrix(phi)
-    result = (1 - cmath.i/)
+    result = (1 - cmath.i)
 
 #generate of random value between 0 and 1
 def random_value():
