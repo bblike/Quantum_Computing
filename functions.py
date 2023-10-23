@@ -3,11 +3,8 @@
 """
 import numpy as np
 import parameters as paras
-import random
-import cmath
 
-def trial(x):
-    return x + 1
+
 
 """
     new ideas: use /phi as parameters and take Hhat as the function calculation.
@@ -17,30 +14,53 @@ def func1(phi):
     return paras.hat*phi#just a idea how the function works, not working indeed.
 
 #density matrix caculation
-def density_matrix(phi):
-    a = phi[0]
-    b = phi[1]
+def density_matrix(prob):
+    a = prob[0]
+    b = prob[1]
+    sum = a + b
+    a = a / sum
+    b = b / sum
     density = [[a, 0], [0, b]]
     return density
 
-#transpose function calculation
-def tri(phi):
-    trimat = np.transpose(phi)
-    return trimat
 
 #one time revolution at time t
-def revolution(phi, t):
-    density = density_matrix(phi)
-    result = (1 - cmath.i)
+def evolution(phi, t):
+    print("h=", paras.h)
+    print("heff=", paras.heff)
+    print("delt=", paras.delt)
+    print("phi=", phi)
+    next = (1 - (0+1j)/paras.h*paras.heff * paras.delt) * phi
+    return next
 
-#generate of random value between 0 and 1
-def random_value():
-    random.seed(376940)
-    x = random.random()
-    return x
-
-def norm_squared(phi):
-    result = 0
-
+#compare r with inner products
+def comparison(function, r):
+    print("function=", function)
+    print("r=", r)
+    innerproduct = inner(function)
+    print("inner product =", innerproduct)
+    if r < innerproduct:
+        result = function / np.sqrt(innerproduct)
+    else:
+        result = daga(function)/np.sqrt(inner(daga(function)))
     return result
 
+def norm_squared(phi):
+    norm = np.linalg.norm(phi)
+    return phi/norm
+
+def inner(phi):
+    inner_product = np.vdot(np.conj(phi), phi)
+    return inner_product
+
+def daga(function):
+    result = paras.jump * function
+    return result
+
+
+x1 = np.matrix([[1,0],
+               [1,3]])
+x2 = np.matrix([[5],
+                [1]])
+
+print(x1*x2)
