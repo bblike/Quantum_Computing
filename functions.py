@@ -30,7 +30,8 @@ def evolution(phi, t):
     print("heff=", paras.heff)
     print("delt=", paras.delt)
     print("phi=", phi)
-    next = (1 - (0+1j)/paras.h*paras.heff * paras.delt) * phi
+    inter = (1 - (0+1j)/paras.h*paras.heff * paras.delt)
+    next = inter * phi
     return next
 
 #compare r with inner products
@@ -40,14 +41,27 @@ def comparison(function, r):
     innerproduct = inner(function)
     print("inner product =", innerproduct)
     if r < innerproduct:
+        print("Jump failed")
         result = function / np.sqrt(innerproduct)
     else:
+        print("Jump succeed")
         result = daga(function)/np.sqrt(inner(daga(function)))
     return result
 
-def norm_squared(phi):
-    norm = np.linalg.norm(phi)
-    return phi/norm
+def normalisation(phi):
+    [[top],
+     [bot]]=phi
+    print(top)
+    print(bot)
+    treal = top.real
+    timag = top.imag
+    breal = bot.real
+    bimag = bot.imag
+    print(top.imag)
+    print(bot.imag)
+    total = np.sqrt(treal**2+timag**2+breal**2+bimag**2)
+    print(total)
+    return phi/total
 
 def inner(phi):
     inner_product = np.vdot(np.conj(phi), phi)

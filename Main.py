@@ -21,12 +21,19 @@ x = func.density_matrix(paras.prob)
 print("which gives the density function: ", x)
 y = paras.init
 print("the original state is:", y)
+
 print("doing the first revolution")
 result1 = func.evolution(y, paras.delt)
 print("result1 = ", result1)
+
 print("doing the first comparison")
-print(func.norm_squared(result1))
+
+random.seed(384756)
 flag = func.comparison(result1, random.random())
 print("flag=", flag)
+
+print("renormalisation")
+print("results = ", func.normalisation(flag))
+
 
 
