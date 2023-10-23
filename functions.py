@@ -3,7 +3,7 @@
 """
 import numpy as np
 import parameters as paras
-
+import decimal
 
 
 """
@@ -57,10 +57,3 @@ def daga(function):
     result = paras.jump * function
     return result
 
-
-x1 = np.matrix([[1,0],
-               [1,3]])
-x2 = np.matrix([[5],
-                [1]])
-
-print(x1*x2)
