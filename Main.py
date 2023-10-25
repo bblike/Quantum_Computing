@@ -10,7 +10,7 @@ import functions as func
 import parameters as paras
 import random
 import numpy as np
-
+random.seed(384756)
 
 
 
@@ -28,12 +28,26 @@ print("result1 = ", result1)
 
 print("doing the first comparison")
 
-random.seed(384756)
 flag = func.comparison(result1, random.random())
 print("flag=", flag)
 
 print("renormalisation")
-print("results = ", func.normalisation(flag))
+normed_result = func.normalisation(flag)
+print("results = ", normed_result)
+
+print("********************************************")
+print("doing the second revolution")
+result1 = func.evolution(normed_result, paras.delt)
+print("result1 = ", result1)
+
+print("doing the first comparison")
+
+flag = func.comparison(result1, random.random())
+print("flag=", flag)
+
+print("renormalisation")
+normed_result = func.normalisation(flag)
+print("results = ", normed_result)
 
 
 
