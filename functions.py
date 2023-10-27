@@ -15,22 +15,21 @@ def func1(phi):
 
 #density matrix caculation
 def density_matrix(prob):
-    a = prob[0]
-    b = prob[1]
-    sum = a + b
-    a = a / sum
-    b = b / sum
-    density = [[a, 0], [0, b]]
+    [[a],[b]] = prob
+    sum = a**2 + b**2
+    density = [[a**2/sum, 0], [0, b**2/sum]]
     return density
 
 
 #one time revolution at time t
 def evolution(phi, t):
+
     print("h=", paras.h)
     print("heff=", paras.heff)
     print("delt=", paras.delt)
     print("phi=", phi)
     inter = (1 - (0+1j)/paras.h*paras.heff * paras.delt)
+    print("inter = ", inter)
     next = inter * phi
     return next
 
@@ -40,7 +39,7 @@ def comparison(function, r):
     print("r=", r)
     innerproduct = inner(function)
     print("inner product =", innerproduct)
-    if r < innerproduct:
+    if inner_compare(r, innerproduct):
         print("Jump failed")
         result = function / np.sqrt(innerproduct)
     else:
@@ -48,17 +47,27 @@ def comparison(function, r):
         result = daga(function)/np.sqrt(inner(daga(function)))
     return result
 
+def inner_compare(x,y):
+    a = x.real
+    b = x.imag
+    c = y.real
+    d = y.imag
+    print(np.sqrt(c**2+d**2))
+    if a**2+b**2 < c**2+d**2:
+        return True
+    else:
+        return False
+
+
 def normalisation(phi):
     [[top],
      [bot]]=phi
-    print(top)
-    print(bot)
+
     treal = top.real
     timag = top.imag
     breal = bot.real
     bimag = bot.imag
-    print(top.imag)
-    print(bot.imag)
+
     total = np.sqrt(treal**2+timag**2+breal**2+bimag**2)
     print(total)
     return phi/total

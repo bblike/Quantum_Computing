@@ -19,35 +19,43 @@ random.seed(384756)
 print("The initial states are probability = ", paras.prob)
 x = func.density_matrix(paras.prob)
 print("which gives the density function: ", x)
-y = paras.init
+y = paras.prob
+y1 = paras.prob1
 print("the original state is:", y)
 
-print("doing the first revolution")
-result1 = func.evolution(y, paras.delt)
-print("result1 = ", result1)
 
-print("doing the first comparison")
+def one_complete_evolution(func1, func2):
+    function = np.matrix([[func1],[func2]])
+    print("doing the first revolution")
+    result1 = func.evolution(function, paras.delt)
+    print("result1 = ", result1)
 
-flag = func.comparison(result1, random.random())
-print("flag=", flag)
+    print("doing the first comparison")
 
-print("renormalisation")
-normed_result = func.normalisation(flag)
-print("results = ", normed_result)
+    flag = func.comparison(result1, random.random())
+    print("flag=", flag)
 
-print("********************************************")
-print("doing the second revolution")
-result1 = func.evolution(normed_result, paras.delt)
-print("result1 = ", result1)
-
-print("doing the first comparison")
-
-flag = func.comparison(result1, random.random())
-print("flag=", flag)
-
-print("renormalisation")
-normed_result = func.normalisation(flag)
-print("results = ", normed_result)
+    print("renormalisation")
+    normed_result = func.normalisation(flag)
+    print("results = ", normed_result)
+    return normed_result
 
 
+funcs = np.array(y1)
+print(type(funcs))
+print("funcs = ", funcs[1])
+for i in range(0, 1000):
+    if i == 0:
 
+        result = one_complete_evolution(funcs[i], funcs[i+1])
+    if i > 0:
+        print(funcs[0][i])
+        result = one_complete_evolution(funcs[0][i], funcs[1][i])
+    print(result)
+    result1 = np.array(result)
+    print("funcs = ", funcs)
+    print("result1 = ", result1)
+    funcs = np.c_[funcs, result1]
+    print("new funcs is", funcs)
+    print("evolution {} finished.".format(i))
+    print("***********************************")

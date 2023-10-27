@@ -6,17 +6,19 @@ import cmath
 import random
 import cmath
 
-
-det = 0.10              #delta sign
-rabi = 0                #omega sign
+a, b = 0.6, 0.8
+det = 0.1              #delta sign
+rabi = 10                #omega sign
 Gamma = 0.1 * rabi      #Gamma sign
 h = 6.626e-34           #planck constant
 hbar = h/2/np.pi
 m = 9.11e-31            #mass of a electron
 hat = np.matrix([[1, 0],
                  [0, 1]])
-prob = np.array([3, 7]) #[a,b] represent for a/(a+b) with [1,0] and b/(a+b) with [0,1]
-delt = 0.10000000000
+prob = np.matrix([[a],
+                  [b]]) #[a,b] represent for a/(a+b) with [1,0] and b/(a+b) with [0,1]
+prob1 = np.array([a,b])
+delt = 0.1
 heff = hbar/2*np.matrix([[det, rabi],
                          [rabi, -det-(0+1j)*Gamma]])
 init = np.matrix([[0],
