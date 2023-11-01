@@ -23,7 +23,7 @@ y = paras.prob
 y1 = paras.prob1
 #print("the original state is:", y)
 finals = []
-n_cpu = 4
+n_cpu = 8
 
 
 def one_complete_evolution(func1, func2):
@@ -50,7 +50,7 @@ def one_particle():
     #print(type(funcs))
     #print("funcs = ", funcs[1])
     result = []
-    for i in range(0, 1000):
+    for i in range(0, paras.time):
         if i == 0:
             result, flag = one_complete_evolution(funcs[i], funcs[i+1])
         if i > 0:
@@ -117,11 +117,7 @@ def parallel():
                 res.append(q.get())
     for proc in procs:
         proc.join()
-    print("1")
 
-
-
-    print(res)
     return res
 if __name__ == '__main__':
 
@@ -133,6 +129,6 @@ if __name__ == '__main__':
         plot1[i] = np.sum(plot[i])
     print(plot1)
     plt.figure()
-    plt.plot(np.array(range(len(plot1))), plot1)
+    plt.plot(np.array(range(len(plot1)))/paras.delt, plot1)
     plt.show()
 
