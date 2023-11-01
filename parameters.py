@@ -25,7 +25,7 @@ init = np.matrix([[0],
                   [1]])
 jump = np.sqrt(Gamma/2) * np.matrix([[0,1],
                                      [0,0]])
-sucounter = []
+
 #random value defined
 def random_value():
     random.seed(376940)

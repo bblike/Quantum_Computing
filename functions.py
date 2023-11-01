@@ -7,12 +7,6 @@ import scipy
 import decimal
 
 
-"""
-    new ideas: use /phi as parameters and take Hhat as the function calculation.
-"""
-#test function
-def func1(phi):
-    return paras.hat*phi#just a idea how the function works, not working indeed.
 
 #density matrix caculation
 def density_matrix(prob):
@@ -25,38 +19,38 @@ def density_matrix(prob):
 #one time revolution at time t
 def evolution(phi, t):
 
-    print("h=", paras.h)
-    print("heff=", paras.heff)
-    print("delt=", paras.delt)
-    print("phi=", phi)
+    #print("h=", paras.h)
+    #print("heff=", paras.heff)
+    #print("delt=", paras.delt)
+    #print("phi=", phi)
 
     inter = (np.matrix([[1,0],[0,1]]) - (0+1j)/paras.hbar*paras.heff * paras.delt)
-    print("inter = ", inter)
+    #print("inter = ", inter)
     next = inter * phi
     return next
 
 #compare r with inner products
 def comparison(function, r):
-    print("function=", function)
-    print("r=", r)
+    temp = []
+    #print("function=", function)
+    #print("r=", r)
     innerproduct = inner(function)
-    print("inner product =", innerproduct)
+    #print("inner product =", innerproduct)
     if inner_compare(r, innerproduct):
-        print("Jump failed")
-        paras.sucounter.append([0])
+        #print("Jump failed")
+        temp = [0]
         result = function / np.sqrt(innerproduct)
     else:
-        print("Jump succeed")
-        paras.sucounter.append([1])
+        #print("Jump succeed")
+        temp = [1]
         result = daga(function)/np.sqrt(inner(daga(function)))
-    return result
-
+    return result, temp
 def inner_compare(x,y):
     a = x.real
     b = x.imag
     c = y.real
     d = y.imag
-    print(np.sqrt(c**2+d**2))
+
     if a**2+b**2 < c**2+d**2:
         return True
     else:
