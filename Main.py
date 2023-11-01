@@ -10,6 +10,7 @@ import functions as func
 import parameters as paras
 import random
 import numpy as np
+import matplotlib.pyplot as plt
 random.seed(384756)
 
 
@@ -31,8 +32,9 @@ def one_complete_evolution(func1, func2):
     print("result1 = ", result1)
 
     print("doing the first comparison")
-
-    flag = func.comparison(result1, random.random())
+    r = random.random()
+    rt.append(r)
+    flag = func.comparison(result1, r)
     print("flag=", flag)
 
     print("renormalisation")
@@ -40,22 +42,31 @@ def one_complete_evolution(func1, func2):
     print("results = ", normed_result)
     return normed_result
 
-
+rt = []
 funcs = np.array(y1)
 print(type(funcs))
 print("funcs = ", funcs[1])
+
 for i in range(0, 1000):
     if i == 0:
-
         result = one_complete_evolution(funcs[i], funcs[i+1])
     if i > 0:
-        print(funcs[0][i])
+        #print(funcs[0][i])
         result = one_complete_evolution(funcs[0][i], funcs[1][i])
-    print(result)
+    #print(result)
     result1 = np.array(result)
-    print("funcs = ", funcs)
-    print("result1 = ", result1)
+    #print("funcs = ", funcs)
+    #print("result1 = ", result1)
     funcs = np.c_[funcs, result1]
-    print("new funcs is", funcs)
+    #print("new funcs is", funcs)
     print("evolution {} finished.".format(i))
     print("***********************************")
+
+print(paras.sucounter)
+
+x = funcs
+
+plt.figure()
+plt.plot(np.array(range(0, 1001)), funcs[0])
+plt.show()
+

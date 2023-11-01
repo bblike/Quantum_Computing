@@ -3,6 +3,7 @@
 """
 import numpy as np
 import parameters as paras
+import scipy
 import decimal
 
 
@@ -28,7 +29,8 @@ def evolution(phi, t):
     print("heff=", paras.heff)
     print("delt=", paras.delt)
     print("phi=", phi)
-    inter = (1 - (0+1j)/paras.h*paras.heff * paras.delt)
+
+    inter = (np.matrix([[1,0],[0,1]]) - (0+1j)/paras.hbar*paras.heff * paras.delt)
     print("inter = ", inter)
     next = inter * phi
     return next
@@ -41,9 +43,11 @@ def comparison(function, r):
     print("inner product =", innerproduct)
     if inner_compare(r, innerproduct):
         print("Jump failed")
+        paras.sucounter.append([0])
         result = function / np.sqrt(innerproduct)
     else:
         print("Jump succeed")
+        paras.sucounter.append([1])
         result = daga(function)/np.sqrt(inner(daga(function)))
     return result
 
@@ -62,15 +66,25 @@ def inner_compare(x,y):
 def normalisation(phi):
     [[top],
      [bot]]=phi
-
+    """
     treal = top.real
     timag = top.imag
     breal = bot.real
     bimag = bot.imag
-
+    t = np.sqrt(treal**2+timag**2)
+    b = np.sqrt(breal**2+bimag**2)
     total = np.sqrt(treal**2+timag**2+breal**2+bimag**2)
     print(total)
-    return phi/total
+    phi[0][0] = np.real(t/total)
+    phi[1][0] = np.real(b/total)"""
+    top = np.abs(top)
+    bot = np.abs(bot)
+    total = np.sqrt(top**2+bot**2)
+    top = top / total
+    bot = bot / total
+    phi[0][0] = top
+    phi[1][0] = bot
+    return phi
 
 def inner(phi):
     inner_product = np.vdot(np.conj(phi), phi)
