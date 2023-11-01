@@ -11,6 +11,7 @@ import parameters as paras
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 random.seed(384756)
 
 
@@ -33,7 +34,7 @@ def one_complete_evolution(func1, func2):
 
     print("doing the first comparison")
     r = random.random()
-    rt.append(r)
+
     flag = func.comparison(result1, r)
     print("flag=", flag)
 
@@ -42,31 +43,46 @@ def one_complete_evolution(func1, func2):
     print("results = ", normed_result)
     return normed_result
 
-rt = []
-funcs = np.array(y1)
-print(type(funcs))
-print("funcs = ", funcs[1])
+def one_particle():
+    paras.sucounter = []
+    funcs = np.array(y1)
+    print(type(funcs))
+    print("funcs = ", funcs[1])
+    result = []
+    for i in range(0, 1000):
+        if i == 0:
+            result = one_complete_evolution(funcs[i], funcs[i+1])
+        if i > 0:
+            #print(funcs[0][i])
+            result = one_complete_evolution(funcs[0][i], funcs[1][i])
+        #print(result)
+        result1 = np.array(result)
+        #print("funcs = ", funcs)
+        #print("result1 = ", result1)
+        funcs = np.c_[funcs, result1]
+        #print("new funcs is", funcs)
+        print("evolution {} finished.".format(i))
+        print("***********************************")
 
-for i in range(0, 1000):
-    if i == 0:
-        result = one_complete_evolution(funcs[i], funcs[i+1])
-    if i > 0:
-        #print(funcs[0][i])
-        result = one_complete_evolution(funcs[0][i], funcs[1][i])
-    #print(result)
-    result1 = np.array(result)
-    #print("funcs = ", funcs)
-    #print("result1 = ", result1)
-    funcs = np.c_[funcs, result1]
-    #print("new funcs is", funcs)
-    print("evolution {} finished.".format(i))
-    print("***********************************")
+    print(paras.sucounter)
+    return paras.sucounter
 
-print(paras.sucounter)
+finals = []
+for i in range(1, 10):
+    x = one_particle()
+    if finals == []:
+        finals = x
+    else:
+        for m in range(0, len(x)):
+            finals[m] = finals[m] + x[m]
+    print("{} particle calculation done.".format(i))
+    print("finals = ", finals)
+    time.sleep(0.5)
 
-x = funcs
+for i in range(0, len(finals)):
+    finals[i] = sum(finals[i])
 
 plt.figure()
-plt.plot(np.array(range(0, 1001)), funcs[0])
+plt.plot(np.array(range(0, 1000)), finals)
 plt.show()
 
