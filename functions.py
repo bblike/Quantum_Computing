@@ -31,20 +31,21 @@ def evolution(phi, t):
 
 #compare r with inner products
 def comparison(function, r):
-    temp = []
+
     #print("function=", function)
-    #print("r=", r)
+    print("r=", r)
     innerproduct = inner(function)
-    #print("inner product =", innerproduct)
+    print("inner product =", innerproduct)
     if inner_compare(r, innerproduct):
         #print("Jump failed")
-        temp = [0]
+
         result = function / np.sqrt(innerproduct)
     else:
         #print("Jump succeed")
-        temp = [1]
+
         result = daga(function)/np.sqrt(inner(daga(function)))
-    return result, temp
+
+    return result
 def inner_compare(x,y):
     a = x.real
     b = x.imag
@@ -58,19 +59,9 @@ def inner_compare(x,y):
 
 
 def normalisation(phi):
+
     [[top],
      [bot]]=phi
-    """
-    treal = top.real
-    timag = top.imag
-    breal = bot.real
-    bimag = bot.imag
-    t = np.sqrt(treal**2+timag**2)
-    b = np.sqrt(breal**2+bimag**2)
-    total = np.sqrt(treal**2+timag**2+breal**2+bimag**2)
-    print(total)
-    phi[0][0] = np.real(t/total)
-    phi[1][0] = np.real(b/total)"""
     top = np.abs(top)
     bot = np.abs(bot)
     total = np.sqrt(top**2+bot**2)
@@ -78,7 +69,9 @@ def normalisation(phi):
     bot = bot / total
     phi[0][0] = top
     phi[1][0] = bot
-    return phi
+    temp = [top**2]
+    #print(top**2+bot**2)
+    return phi, temp
 
 def inner(phi):
     inner_product = np.vdot(np.conj(phi), phi)

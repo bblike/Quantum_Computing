@@ -13,7 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 import multiprocessing as mp
-random.seed(384756)
+#random.seed(384756)
 
 # this is the beginning of matrix
 #print("The initial states are probability = ", paras.prob)
@@ -23,7 +23,7 @@ y = paras.prob
 y1 = paras.prob1
 #print("the original state is:", y)
 finals = []
-n_cpu = 8
+n_cpu = 1
 
 
 def one_complete_evolution(func1, func2):
@@ -35,12 +35,12 @@ def one_complete_evolution(func1, func2):
     #print("doing the first comparison")
     r = random.random()
 
-    flag, counter = func.comparison(result1, r)
-    #print("flag=", flag)
+    flag = func.comparison(result1, r)
 
     #print("renormalisation")
-    normed_result = func.normalisation(flag)
-    #print("results = ", normed_result)
+    normed_result, counter = func.normalisation(flag)
+    print("unnormaled=", flag)
+    print("normaled = ", normed_result)
     return normed_result, counter
 
 def one_particle():
@@ -67,6 +67,7 @@ def one_particle():
         #print("***********************************")
 
     #print(sucounter)
+    print(sucounter)
     return sucounter
 
 def task(q,n, l):
@@ -87,9 +88,9 @@ def task(q,n, l):
     q.put(res)
 
 def parallel():
-    l=mp.Lock()
+    l = mp.Lock()
     q = mp.Queue()
-    total = 1000
+    total = 1
     procs = []
     ret = []
     chunk_size = int(total / n_cpu)
@@ -119,16 +120,28 @@ def parallel():
         proc.join()
 
     return res
+
+def unpack(a):
+    new_list = []
+    for element in a:
+        new_list.append(element[0])
+    return new_list
 if __name__ == '__main__':
 
     finals = parallel()
     print("program done")
-    plot = np.array(finals[0]) + np.array(finals[1])
+    print(finals)
+    print(len(finals[n_cpu-1]))
+    plot = np.array(finals[0])
+    for i in range(3):
+        plot = unpack(plot)
     plot1 = np.zeros(len(plot))
-    for i in range(len(plot)):
-        plot1[i] = np.sum(plot[i])
-    print(plot1)
-    plt.figure()
-    plt.plot(np.array(range(len(plot1)))/paras.delt, plot1)
-    plt.show()
 
+    print(plot)
+    a = plt.figure()
+    plt.plot(np.array(range(len(plot)))*paras.delt, plot)
+    plt.title("Single qubit simulation")
+    plt.xlabel("Population")
+    plt.ylabel("time")
+    plt.show()
+    a.savefig("SingleQubit.png")
