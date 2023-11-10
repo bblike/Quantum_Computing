@@ -19,46 +19,53 @@ import multiprocessing as mp
 #print("The initial states are probability = ", paras.prob)
 x = func.density_matrix(paras.prob)
 #print("which gives the density function: ", x)
-y = paras.prob
 y1 = paras.prob1
 #print("the original state is:", y)
 finals = []
-n_cpu = 1
+n_cpu = 6
+n_particle = 1000
 
-
-def one_complete_evolution(func1, func2):
-    function = np.matrix([[func1],[func2]])
+def one_complete_evolution(func1, func2, flag):
+    tracing = []
+    function = np.matrix([[func1], [func2]])
     #print("doing the first revolution")
+
     result1 = func.evolution(function, paras.delt)
     #print("result1 = ", result1)
-
+    temp = func.record(result1)
     #print("doing the first comparison")
     r = random.random()
 
-    flag = func.comparison(result1, r)
+    result, traced, flag = func.comparison(result1, r, flag)
+    tracing.append(traced)
+    #record the value
 
-    #print("renormalisation")
-    normed_result, counter = func.normalisation(flag)
-    print("unnormaled=", flag)
-    print("normaled = ", normed_result)
-    return normed_result, counter
+
+    print("unnormaled=", result)
+    #print("normaled = ", normed_result)
+    return result, temp, flag #result is the function, tracing is bool in 1/0 represent success or not
 
 def one_particle():
     sucounter = []
-    flag = []
+    flag = 0
+    flag_tracing = [0]
     funcs = np.array(y1)
+    tracing1 = []
     #print(type(funcs))
     #print("funcs = ", funcs[1])
     result = []
-    for i in range(0, paras.time):
+    result1 = []
+    for i in range(0, int(paras.time/paras.delt)):
         if i == 0:
-            result, flag = one_complete_evolution(funcs[i], funcs[i+1])
+            result, tracing, flag = one_complete_evolution(funcs[i], funcs[i+1], flag)
         if i > 0:
             #print(funcs[0][i])
-            result, flag = one_complete_evolution(funcs[0][i], funcs[1][i])
+            result, tracing, flag = one_complete_evolution(funcs[0][i], funcs[1][i], flag)
         #print(result)
         result1 = np.array(result)
-        sucounter.append(flag)
+        tracing1.append(np.array(tracing))
+        flag_tracing.append(flag)
+        #sucounter.append(flag)
         #print("funcs = ", funcs)
         #print("result1 = ", result1)
         funcs = np.c_[funcs, result1]
@@ -67,30 +74,32 @@ def one_particle():
         #print("***********************************")
 
     #print(sucounter)
-    print(sucounter)
-    return sucounter
+    #print(sucounter)
+    return funcs, tracing1, flag_tracing
 
 def task(q,n, l):
     res = []
-
+    flags = []
     for k in n:
         for i in k:
-            re = one_particle()
+            function, re, flag= one_particle()
             #print(re)
             #print("{} finished".format(i))
             if res == []:
                 res = re
+                flags = flag
             else:
                 for j in range(len(res)):
                     res[j] = res[j] + re[j]
+                    flags[j] = flags[j] + flag[j]
             print("job {} finished".format(i))
     #print("res = ", res)
-    q.put(res)
+    q.put(flags)
 
 def parallel():
     l = mp.Lock()
     q = mp.Queue()
-    total = 1
+    total = n_particle
     procs = []
     ret = []
     chunk_size = int(total / n_cpu)
@@ -126,22 +135,56 @@ def unpack(a):
     for element in a:
         new_list.append(element[0])
     return new_list
+
+def plot_flag(x):
+    new_list = []
+    for element in x:
+        if new_list != []:
+            for i in range(len(new_list)):
+                new_list[i] += np.array(element[i])
+        else:
+            new_list = element
+    return np.array(new_list)
+
+
 if __name__ == '__main__':
 
     finals = parallel()
     print("program done")
-    print(finals)
-    print(len(finals[n_cpu-1]))
+    #print(finals)
+    #print(len(finals[n_cpu-1]))
+
+    #single tracing
+    """ 
     plot = np.array(finals[0])
-    for i in range(3):
+    for i in range(2):
         plot = unpack(plot)
     plot1 = np.zeros(len(plot))
 
     print(plot)
     a = plt.figure()
     plt.plot(np.array(range(len(plot)))*paras.delt, plot)
-    plt.title("Single qubit simulation")
-    plt.xlabel("Population")
-    plt.ylabel("time")
+
+    """
+    #multiple tracing
+    print(finals)
+    """plot1 = np.zeros(int(paras.time/paras.delt))
+    for element in finals:
+        temp_plot = np.array(element)
+        for i in range(2):
+            plot = unpack(temp_plot)
+            for j in range(len(plot)):
+                plot1[j] += int(plot[j])"""
+    plot1 = plot_flag(finals)
+    print(plot1)
+    #plot the graph
+    a = plt.figure()
+    xs = np.array(range(len(plot1)))*paras.delt
+    ys = plot1/n_particle
+    plt.plot(xs[:-1], ys[:-1])
+    plt.title("multiple")
+    plt.ylim([0,1])
+    plt.ylabel("Population")
+    plt.xlabel("time")
     plt.show()
-    a.savefig("SingleQubit.png")
+    a.savefig("multiple_particle_trajectory1.png")

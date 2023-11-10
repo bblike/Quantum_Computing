@@ -24,28 +24,32 @@ def evolution(phi, t):
     #print("delt=", paras.delt)
     #print("phi=", phi)
 
-    inter = (np.matrix([[1,0],[0,1]]) - (0+1j)/paras.hbar*paras.heff * paras.delt)
+    inter = (np.matrix([[1,0],[0,1]]) - (0+1j)*paras.heff * paras.delt)
     #print("inter = ", inter)
     next = inter * phi
     return next
 
 #compare r with inner products
-def comparison(function, r):
-
+def comparison(function, r, flag):
+    temp = []
     #print("function=", function)
     print("r=", r)
     innerproduct = inner(function)
     print("inner product =", innerproduct)
-    if inner_compare(r, innerproduct):
-        #print("Jump failed")
-
+    if r < innerproduct:
+        print("Jump failed")
+        temp.append(0)
         result = function / np.sqrt(innerproduct)
     else:
-        #print("Jump succeed")
-
+        print("Jump succeed")
+        temp.append(1)
+        if flag == 0:
+            flag = 1
+        elif flag == 1:
+            flag = 0
         result = daga(function)/np.sqrt(inner(daga(function)))
 
-    return result
+    return result, temp, flag
 def inner_compare(x,y):
     a = x.real
     b = x.imag
@@ -58,23 +62,16 @@ def inner_compare(x,y):
         return False
 
 
-def normalisation(phi):
+def record(phi):
 
     [[top],
      [bot]]=phi
     top = np.abs(top)
-    bot = np.abs(bot)
-    total = np.sqrt(top**2+bot**2)
-    top = top / total
-    bot = bot / total
-    phi[0][0] = top
-    phi[1][0] = bot
-    temp = [top**2]
-    #print(top**2+bot**2)
-    return phi, temp
+
+    return top
 
 def inner(phi):
-    inner_product = np.vdot(np.conj(phi), phi)
+    inner_product = np.abs(np.vdot(np.conj(phi), phi))
     return inner_product
 
 def daga(function):
