@@ -13,7 +13,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 import multiprocessing as mp
+from tqdm import tqdm
 #random.seed(384756)
+
 
 # this is the beginning of matrix
 #print("The initial states are probability = ", paras.prob)
@@ -22,8 +24,23 @@ x = func.density_matrix(paras.prob)
 y1 = paras.prob1
 #print("the original state is:", y)
 finals = []
-n_cpu = 6
+n_cpu = 8
 n_particle = 1000
+total_task = int(n_particle*paras.time/paras.delt)
+current_task = 0
+
+
+def update():
+    global current_task
+    pre = 0
+    current = 0
+    current_task = current_task + 1
+    print("current_task=", current_task)
+    current = int(current_task*100/total_task)
+    if current != pre:
+        print("{}% finished.".format(current))
+
+
 
 def one_complete_evolution(func1, func2, flag):
     tracing = []
@@ -32,20 +49,21 @@ def one_complete_evolution(func1, func2, flag):
 
     result1 = func.evolution(function, paras.delt)
     #print("result1 = ", result1)
-    temp = func.record(result1)
+
     #print("doing the first comparison")
     r = random.random()
-
+    temp = 0
     result, traced, flag = func.comparison(result1, r, flag)
     tracing.append(traced)
     #record the value
 
 
-    print("unnormaled=", result)
+    #print("unnormaled=", result)
     #print("normaled = ", normed_result)
-    return result, temp, flag #result is the function, tracing is bool in 1/0 represent success or not
+    return result, traced, flag #result is the function, tracing is bool in 1/0 represent success or not
 
 def one_particle():
+    global current_task
     sucounter = []
     flag = 0
     flag_tracing = [0]
@@ -75,14 +93,18 @@ def one_particle():
 
     #print(sucounter)
     #print(sucounter)
+
+    update()
     return funcs, tracing1, flag_tracing
 
 def task(q,n, l):
     res = []
     flags = []
+    current = 0
     for k in n:
         for i in k:
             function, re, flag= one_particle()
+
             #print(re)
             #print("{} finished".format(i))
             if res == []:
@@ -92,9 +114,9 @@ def task(q,n, l):
                 for j in range(len(res)):
                     res[j] = res[j] + re[j]
                     flags[j] = flags[j] + flag[j]
-            print("job {} finished".format(i))
+
     #print("res = ", res)
-    q.put(flags)
+    q.put([res, flags])
 
 def parallel():
     l = mp.Lock()
@@ -104,6 +126,9 @@ def parallel():
     ret = []
     chunk_size = int(total / n_cpu)
     print("Number of used: ", n_cpu)
+    print("total task number: ", total_task)
+    print("estimated time: ", total_task/n_cpu/13625, "s")
+    begin=time.time()
     #distribute tasks
     for i in range(0, n_cpu):
         min_i = chunk_size * i
@@ -127,14 +152,16 @@ def parallel():
                 res.append(q.get())
     for proc in procs:
         proc.join()
+    end=time.time()
+    print("time spent = {}s".format(end-begin))
 
-    return res
+    return res, end
 
 def unpack(a):
     new_list = []
     for element in a:
-        new_list.append(element[0])
-    return new_list
+        new_list.append(element)
+    return np.array(new_list)
 
 def plot_flag(x):
     new_list = []
@@ -146,10 +173,24 @@ def plot_flag(x):
             new_list = element
     return np.array(new_list)
 
+def diff(a,b):
+    result = []
+    for i in range(len(a)):
+        if a[i] == 0:
+            result.append(0)
+        else:
+            result.append((a[i]-b[i])/b[i])
+
+    return result
 
 if __name__ == '__main__':
 
-    finals = parallel()
+    final, times = parallel()
+    finals = []
+    finals2 = []
+    for element in final:
+        finals.append(element[0])
+        finals2.append(element[1])
     print("program done")
     #print(finals)
     #print(len(finals[n_cpu-1]))
@@ -167,7 +208,7 @@ if __name__ == '__main__':
 
     """
     #multiple tracing
-    print(finals)
+    #print(finals)
     """plot1 = np.zeros(int(paras.time/paras.delt))
     for element in finals:
         temp_plot = np.array(element)
@@ -175,16 +216,46 @@ if __name__ == '__main__':
             plot = unpack(temp_plot)
             for j in range(len(plot)):
                 plot1[j] += int(plot[j])"""
-    plot1 = plot_flag(finals)
-    print(plot1)
+
+
+
+    plot = plot_flag(finals)
+    plot1 = np.squeeze(plot)
+    #print(plot1)
     #plot the graph
+
+
+
+
+    # Analytical method
+    anapop = []
+    sinecoef = (3 * paras.Gamma) / np.sqrt(16 * paras.rabi ** 2 - paras.Gamma ** 2)
+    frontfactor = (paras.rabi ** 2) / (2 * (paras.rabi ** 2) + paras.Gamma ** 2)
+
+
+    for t in range(int(paras.time/paras.delt)):
+        bothcoef = (np.exp(-3 * paras.Gamma * t * paras.delt / 4))
+        argument = np.sqrt(paras.rabi ** 2 - paras.Gamma ** 2 / 16) * t * paras.delt
+        r11ana = frontfactor * (1 - bothcoef * (np.cos(argument) + sinecoef * np.sin(argument)))
+        anapop.append(r11ana)
+
+
     a = plt.figure()
-    xs = np.array(range(len(plot1)))*paras.delt
+    fig, ax = plt.subplots(2, 1, figsize = [16,9], gridspec_kw={'height_ratios': [3, 1]}, sharex = True)
+    xs = np.array(range(len(plot1)))
     ys = plot1/n_particle
-    plt.plot(xs[:-1], ys[:-1])
-    plt.title("multiple")
-    plt.ylim([0,1])
-    plt.ylabel("Population")
-    plt.xlabel("time")
+
+    ax[0].plot(range(int(paras.time/paras.delt)), anapop, label='Analytic', color='green')
+    ax[0].plot(xs[:-1], ys[:-1], label='Monte Carlo', color='blue')
+
+    ax[0].legend()
+    diffplot = diff(anapop[:-1], ys[:-1])
+    ax[1].plot(xs[20:-1], diffplot[20:])
+    ax[1].legend()
+
+    yline = np.zeros(len(xs[:-1]))
+    yline += 0.01
+    ax[1].plot(xs[20:-1], yline[20:])
+    yline -= 0.02
+    ax[1].plot(xs[20:-1], yline[20:])
     plt.show()
-    a.savefig("multiple_particle_trajectory1.png")

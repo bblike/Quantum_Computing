@@ -3,8 +3,6 @@
 """
 import numpy as np
 import parameters as paras
-import scipy
-import decimal
 
 
 
@@ -31,47 +29,33 @@ def evolution(phi, t):
 
 #compare r with inner products
 def comparison(function, r, flag):
-    temp = []
+
     #print("function=", function)
-    print("r=", r)
+    #print("r=", r)
     innerproduct = inner(function)
-    print("inner product =", innerproduct)
+    #print("inner product =", innerproduct)
+
     if r < innerproduct:
-        print("Jump failed")
-        temp.append(0)
+        #print("Jump failed")
+
         result = function / np.sqrt(innerproduct)
     else:
-        print("Jump succeed")
-        temp.append(1)
+        #print("Jump succeed")
+
         if flag == 0:
             flag = 1
         elif flag == 1:
             flag = 0
-        result = daga(function)/np.sqrt(inner(daga(function)))
 
+        result = np.matrix([[1],[0]])
+    temp = np.abs(np.conj(result[1])*result[1])
+
+    #print(temp)
     return result, temp, flag
-def inner_compare(x,y):
-    a = x.real
-    b = x.imag
-    c = y.real
-    d = y.imag
 
-    if a**2+b**2 < c**2+d**2:
-        return True
-    else:
-        return False
-
-
-def record(phi):
-
-    [[top],
-     [bot]]=phi
-    top = np.abs(top)
-
-    return top
 
 def inner(phi):
-    inner_product = np.abs(np.vdot(np.conj(phi), phi))
+    inner_product = phi[0]*np.conj(phi[0])+phi[1]*np.conj(phi[1])
     return inner_product
 
 def daga(function):
