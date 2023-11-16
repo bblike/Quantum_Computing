@@ -26,3 +26,4 @@ daga: function to calculate the daga operator.
  
 parameters.py: It contains some of the unchanged parameters that used.
 
+try run it on the jupyter notebook on university server
