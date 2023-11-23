@@ -10,7 +10,7 @@ Gamma = 0.1 * rabi      #Gamma sign
 h = 6.626e-34           #planck constant
 
 delt = (1 / 100) * (1 / rabi) * (2 * np.pi)
-time = 1000 * delt # unis: s
+time = 2000 * delt # unis: s
 prob = np.matrix([[a],
                   [b]]) #[a,b] represent for a/(a+b) with [1,0] and b/(a+b) with [0,1]
 prob1 = np.array([a,b])
