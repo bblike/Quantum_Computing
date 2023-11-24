@@ -4,13 +4,14 @@
 import numpy as np
 
 a, b = 1, 0
-det = 0        #delta sign
+det = 0                 #delta sign
 rabi = 1                #omega sign
 Gamma = 0.1 * rabi      #Gamma sign
 h = 6.626e-34           #planck constant
 
-delt = (1 / 100) * (1 / rabi) * (2 * np.pi)
-time = 2000 * delt # unis: s
+delt = (1 / 300) * (1 / rabi)
+iteration = 20000
+time = iteration * delt # unis: s
 prob = np.matrix([[a],
                   [b]]) #[a,b] represent for a/(a+b) with [1,0] and b/(a+b) with [0,1]
 prob1 = np.array([a,b])

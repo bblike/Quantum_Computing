@@ -12,14 +12,15 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import time
+from datetime import datetime
 import multiprocessing as mp
 
 # random.seed(384756)
 y1 = paras.prob1
 finals = []
-n_cpu = 6
+n_cpu = 8
 n_particle = 1000
-total_task = int(n_particle * paras.time / paras.delt)
+total_task = int(n_particle * paras.iteration)
 current_task = 0
 wow = r"""
 
@@ -110,8 +111,15 @@ def parallel():  # multi core processing
     chunk_size = int(total / n_cpu)
     print("Number of Core used: ", n_cpu)
     print("total task number: ", total_task)
-    print("estimated time: ", total_task / n_cpu / 10000, "s")
+    est = total_task/n_cpu/5000
+    est_m = int(est/60)
+    est_h = int(est_m/60)
+    est_m = est_m - est_h*60
+    est_s = est-60*est_m - est_h * 3600
+    print("estimated time: {}h {}m {}s.".format(est_h, est_m, est_s))
     begin = time.time()
+    now = datetime.now()
+    print("start time:", now)
     # distribute tasks
     for i in range(0, n_cpu):
         min_i = chunk_size * i
@@ -136,7 +144,13 @@ def parallel():  # multi core processing
     for proc in procs:
         proc.join()
     end = time.time()
-    print("time spent = {}s".format(end - begin))
+    end_time = datetime.now()
+    end_m = int(end/60)
+    end_h = int(end_m/60)
+    end_m = end_m-end_h*60
+    end_s = round(end - end_m*60 - end_h*3600, 1)
+    print("finish at :", end_time)
+    print("time spent = {}h {}m {}s".format(end_h, end_m, end_s))
 
     return res, end
 
@@ -165,8 +179,8 @@ def diff(a, b):  # calculate the percentage difference
         if a[i] == 0:
             result.append(0)
         else:
-            # result.append((a[i] - b[i]) / a[i])
-            result.append(a[i] - b[i])
+            result.append((a[i] - b[i]) / a[i])
+            # result.append(a[i] - b[i])
 
     return result
 
@@ -198,10 +212,10 @@ if __name__ == '__main__':
     # plot the graph
     plt.figure()
     fig, ax = plt.subplots(2, 1, figsize=[16, 10], gridspec_kw={'height_ratios': [4, 1]}, sharex=True)
-    xs = np.array(range(len(plot1)))
+    xs = np.array(range(len(plot1)))*paras.delt
     ys = plot1 / n_particle
 
-    ax[0].plot(range(int(paras.time / paras.delt)), anapop, label='OBE Analytic', color='green')
+    ax[0].plot(xs, anapop, label='OBE Analytic', color='green')
     ax[0].plot(xs[:-1], ys[:-1], label='Monte Carlo', color='blue')
 
     ax[0].legend()
@@ -217,7 +231,7 @@ if __name__ == '__main__':
     ax[0].set_title("Evolution", size=30)
     ax[0].set_ylabel("Population", size=15)
     ax[1].set_title("Difference", size=30)
-    ax[1].set_xlabel("Time steps", size=15)
+    ax[1].set_xlabel("Time", size=15)
     ax[1].set_ylabel("Percentage", size=15)
     fig.savefig("t={}s,n_particle={}.png".format(round(paras.time, 1), n_particle))
     fig.show()
