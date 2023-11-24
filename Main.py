@@ -21,7 +21,33 @@ n_cpu = 6
 n_particle = 1000
 total_task = int(n_particle * paras.time / paras.delt)
 current_task = 0
+wow = r"""
 
+                       _oo0oo_
+                      o8888888o
+                      88" . "88
+                      (| -_- |)
+                      0\  =  /0
+                    ___/`---'\___
+                  .' \\|     |# '.
+                 / \\|||  :  |||# \
+                / _||||| -:- |||||- \
+               |   | \\\  -  #/ |   |
+               | \_|  ''\---/''  |_/ |
+               \  .-\__  '-'  ___/-. /
+             ___'. .'  /--.--\  `. .'___
+          ."" '<  `.___\_<|>_/___.' >' "".
+         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+         \  \ `_.   \_ __\ /__ _/   .-` /  /
+     =====`-.____`.___ \_____/___.-`___.-'=====
+                       `=---='
+
+
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+               佛祖保佑         永无BUG
+            Buddha bless no bug forever
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+"""
 
 def one_complete_evolution(func1, func2, flag):  # function used for one evolution
 
@@ -35,8 +61,8 @@ def one_complete_evolution(func1, func2, flag):  # function used for one evoluti
 
 
 def one_particle():  # function for a particle in the whole time period
-    flag = 0
-    flag_tracing = [0]
+    flag = []
+    flag_tracing = []
     funcs = np.array(y1)
     tracing1 = []
     tracing = []
@@ -63,13 +89,13 @@ def task(q, n):
         for i in k:
             function, re, flag = one_particle()
 
-            if not res:
+            if not flags:
                 res = re
                 flags = flag
             else:
                 for j in range(len(res)):
                     res[j] = res[j] + re[j]
-                    flags[j] = flags[j] + flag[j]
+                    #flags[j] = flags[j] + flag[j]
 
     # print("res = ", res)
     q.put([res, flags])
@@ -82,7 +108,7 @@ def parallel():  # multi core processing
     procs = []
 
     chunk_size = int(total / n_cpu)
-    print("Number of used: ", n_cpu)
+    print("Number of Core used: ", n_cpu)
     print("total task number: ", total_task)
     print("estimated time: ", total_task / n_cpu / 10000, "s")
     begin = time.time()
@@ -146,7 +172,7 @@ def diff(a, b):  # calculate the percentage difference
 
 
 if __name__ == '__main__':
-
+    print(wow)
     final, times = parallel()
     finals = []
     finals2 = []
@@ -196,3 +222,17 @@ if __name__ == '__main__':
     fig.savefig("t={}s,n_particle={}.png".format(round(paras.time, 1), n_particle))
     fig.show()
 
+
+    # plot the collapse time against time
+    new1 = finals2[0]
+    new = np.ravel(new1)
+    length = len(new)
+    xs = range(length)
+    xs = np.array(xs)/paras.delt/1000
+    fig1 = plt.figure()
+    print(len(xs))
+    print(len(new))
+    plt.plot(xs, np.array(new))
+    plt.title("{}".format(round(paras.time, 1)))
+    plt.savefig("SingleTracing.png")
+    plt.show()

@@ -21,12 +21,15 @@ def comparison(function, r, flag):
     if r < innerproduct:
         # print("Jump failed")
         result = function / np.sqrt(innerproduct)
-
+        #flag = flag + 1
     else:
         # print("Jump succeed")
         #result = jump(function) / np.sqrt(inner(jump(function)))
         result = np.matrix([[1], [0]])  # use of daga calculation give the same method but lose precision
+        # for the time between collapse
+        #flag = 0
     temp = np.abs(np.conj(result[1])*result[1])
+    flag = temp
     # print(temp)
     return result, temp, flag
 
