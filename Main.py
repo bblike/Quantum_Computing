@@ -7,6 +7,7 @@
 """
 
 import functions as func
+import parameters
 import parameters as paras
 import random
 import numpy as np
@@ -19,7 +20,8 @@ import multiprocessing as mp
 y1 = paras.prob1
 finals = []
 n_cpu = 8
-n_particle = 1000
+n_particle = 3000
+path = r"C:\Users\Li Zhejun\Desktop\Quantum_Computing\results"
 total_task = int(n_particle * paras.iteration)
 current_task = 0
 wow = r"""
@@ -111,7 +113,7 @@ def parallel():  # multi core processing
     chunk_size = int(total / n_cpu)
     print("Number of Core used: ", n_cpu)
     print("total task number: ", total_task)
-    est = total_task/n_cpu/5000
+    est = total_task/n_cpu/8000
     est_m = int(est/60)
     est_h = int(est_m/60)
     est_m = est_m - est_h*60
@@ -143,16 +145,17 @@ def parallel():  # multi core processing
                 res.append(q.get())
     for proc in procs:
         proc.join()
-    end = time.time()
+    end = time.time()-begin
     end_time = datetime.now()
     end_m = int(end/60)
     end_h = int(end_m/60)
     end_m = end_m-end_h*60
     end_s = round(end - end_m*60 - end_h*3600, 1)
+    now = end_time
     print("finish at :", end_time)
     print("time spent = {}h {}m {}s".format(end_h, end_m, end_s))
 
-    return res, end
+    return res, end, now
 
 
 def unpack(a):  # change the type of result
@@ -187,7 +190,8 @@ def diff(a, b):  # calculate the percentage difference
 
 if __name__ == '__main__':
     print(wow)
-    final, times = parallel()
+    final, times, now_0 = parallel()
+    now = now_0.strftime("%Y%m%d%H%M%S")
     finals = []
     finals2 = []
     for element in final:
@@ -221,19 +225,35 @@ if __name__ == '__main__':
     ax[0].legend()
     diffplot = diff(anapop[:-1], ys[:-1])
     ax[1].plot(xs[20:-1], diffplot[20:])
-
+    counter_001 = 0
+    counter_005 = 0
+    counter_010 = 0
+    for i in diffplot:
+        if np.abs(i) <= 0.01:
+            counter_001 += 1
+        if np.abs(i) <= 0.05:
+            counter_005 += 1
+        if np.abs(i) <= 0.10:
+            counter_010 += 1
+    per99 = counter_001/len(diffplot)
+    per95 = counter_005 / len(diffplot)
+    per90 = counter_010 / len(diffplot)
+    print(per99)
+    print(per95)
+    print(per90)
+    print("***************")
 
     yline = np.zeros(len(xs[:-1]))
     yline += 0.01
     ax[1].plot(xs[20:-1], yline[20:])
     yline -= 0.02
     ax[1].plot(xs[20:-1], yline[20:])
-    ax[0].set_title("Evolution", size=30)
+    ax[0].set_title("Evolution-{}".format(str(now)), size=30)
     ax[0].set_ylabel("Population", size=15)
     ax[1].set_title("Difference", size=30)
     ax[1].set_xlabel("Time", size=15)
     ax[1].set_ylabel("Percentage", size=15)
-    fig.savefig("t={}s,n_particle={}.png".format(round(paras.time, 1), n_particle))
+    fig.savefig("{}/{}.png".format(path ,str(now)))
     fig.show()
 
 
@@ -242,11 +262,23 @@ if __name__ == '__main__':
     new = np.ravel(new1)
     length = len(new)
     xs = range(length)
-    xs = np.array(xs)/paras.delt/1000
-    fig1 = plt.figure()
+    xs = np.array(xs) * paras.delt
+    fig1 = plt.figure(figsize=[10,5])
     print(len(xs))
     print(len(new))
     plt.plot(xs, np.array(new))
-    plt.title("{}".format(round(paras.time, 1)))
-    plt.savefig("SingleTracing.png")
+    plt.title("Single particle tracing-{}".format(str(now)))
+    plt.xlabel("time/s")
+    plt.ylabel("density function")
+    plt.savefig("{}/S-{}.png".format(path, str(now)))
     plt.show()
+
+    #generate excel table
+    array1 = ['number of particles', '99% acceptance', '95% acceptance', '90% acceptance']
+    array2 = [n_particle, per99, per95, per90]
+    array1.append("time")
+    array2.append(str(now))
+    terms, numbers = func.writearray(array1, array2)
+
+    #func.excelgenerator(terms, numbers)
+    func.write_excel_xls_add_sheet("{}".format(str(now)), terms, numbers)
