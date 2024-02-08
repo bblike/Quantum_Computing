@@ -5,7 +5,6 @@ from xlutils.copy import copy
 
 path = r"C:\Users\Li Zhejun\Desktop\Quantum_Computing\results"
 
-f=open("text.txt", "a")# append files of data
 
 
 workbook = xlrd.open_workbook(r"{}\result.xls".format(path)) # get workbook
@@ -20,8 +19,14 @@ for i in range(number):
     for j in range(rows):
         temp = worksheet.cell_value(j, 2)
         new_sheet.write(j, 3+i, temp)
-        f.write(temp, end = "\t") # append data in the file
+        if j < rows-1:
+            f = open("text.txt", "a")
+            f.write(str(temp))# append data in the file
+            f.write("\t")
+            f.close()
+    f = open("text.txt", "a")
     f.write("\n")
+    f.close()
 new_workbook.save(r"{}\result.xls".format(path))
 print("write finish")
 

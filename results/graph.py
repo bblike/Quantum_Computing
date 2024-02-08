@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-f = open("graph.txt", "r")
+f = open("text.txt", "r")
 temp = []
 for l in f.readlines():
     temp.append(l.strip().split("\t"))
@@ -13,10 +13,10 @@ y2s = []
 y3s = []
 for i in temp:
 
-    xs.append(i[0])
-    y1s.append(round(float(i[1]), 3))
-    y2s.append(round(float(i[2]), 3))
-    y3s.append(round(float(i[3]), 3))
+    xs.append(float(i[1]))
+    y1s.append(round(float(i[2]), 3))
+    y2s.append(round(float(i[3]), 3))
+    y3s.append(round(float(i[4]), 3))
 
 plt.figure()
 

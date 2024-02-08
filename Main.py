@@ -20,7 +20,7 @@ import multiprocessing as mp
 y1 = paras.prob1
 finals = []
 n_cpu = 8
-n_particle = 3000
+n_particle = 250
 path = r"C:\Users\Li Zhejun\Desktop\Quantum_Computing\results"
 total_task = int(n_particle * paras.iteration)
 current_task = 0
