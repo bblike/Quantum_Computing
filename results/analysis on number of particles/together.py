@@ -2,10 +2,16 @@ import xlwt
 import numpy
 import xlrd
 from xlutils.copy import copy
+from datetime import datetime
 
-path = r"C:\Users\Li Zhejun\Desktop\Quantum_Computing\results"
+path = r"C:\Users\Li Zhejun\Desktop\Quantum_Computing\results\analysis on number of particles"
 
-
+f = open("text.txt", "w")
+now = datetime.now()
+nowstr = now.strftime("%Y%m%d%H%M%S")
+f.write(nowstr)
+f.write("\n")
+f.close()
 
 workbook = xlrd.open_workbook(r"{}\result.xls".format(path)) # get workbook
 sheets = workbook.sheet_names() # get worksheet

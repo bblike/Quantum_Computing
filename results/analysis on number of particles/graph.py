@@ -11,7 +11,7 @@ xs = []
 y1s = []
 y2s = []
 y3s = []
-for i in temp:
+for i in temp[1:]:
 
     xs.append(float(i[1]))
     y1s.append(round(float(i[2]), 3))
@@ -20,9 +20,12 @@ for i in temp:
 
 plt.figure()
 
-plt.scatter(xs, y1s, label = "99")
-plt.scatter(xs, y2s, label = "95")
-plt.scatter(xs, y3s, label = "90")
+plt.scatter(xs, y1s, label = "1%")
+plt.scatter(xs, y2s, label = "5%")
+plt.scatter(xs, y3s, label = "10%")
 plt.ylim(0, 1.2)
+plt.xlabel("number of particles")
+plt.ylabel("percentages")
 plt.legend()
+plt.title("Percentages of errors lies within the criteria")
 plt.show()

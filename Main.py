@@ -20,7 +20,7 @@ import multiprocessing as mp
 y1 = paras.prob1
 finals = []
 n_cpu = 8
-n_particle = 250
+n_particle = 1000
 path = r"C:\Users\Li Zhejun\Desktop\Quantum_Computing\results"
 total_task = int(n_particle * paras.iteration)
 current_task = 0
@@ -238,10 +238,7 @@ if __name__ == '__main__':
     per99 = counter_001/len(diffplot)
     per95 = counter_005 / len(diffplot)
     per90 = counter_010 / len(diffplot)
-    print(per99)
-    print(per95)
-    print(per90)
-    print("***************")
+
 
     yline = np.zeros(len(xs[:-1]))
     yline += 0.01
@@ -282,3 +279,7 @@ if __name__ == '__main__':
 
     #func.excelgenerator(terms, numbers)
     func.write_excel_xls_add_sheet("{}".format(str(now)), terms, numbers)
+    print("***************")
+    print(per99)
+    print(per95)
+    print(per90)
