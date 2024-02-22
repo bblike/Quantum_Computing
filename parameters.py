@@ -28,8 +28,11 @@ jump = np.sqrt(Gamma/2) * np.matrix([[0,1],
                                      [0,0]])
 
 #for 2 time correlation
-chi_plus = [1,0]
-chi_mines = [1,0]
+A = np.matrix([[det, rabi],
+                         [rabi, -det-(0+1j)*Gamma]])
+B = np.matrix([[det, rabi],
+                         [rabi, -det-(0+1j)*Gamma]])
+
 
 
 

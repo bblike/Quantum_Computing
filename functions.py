@@ -16,6 +16,8 @@ def evolution(phi, t):
     next_step = inter_step * phi
     return next_step
 
+def two_time_evolution(phi, t):
+    chi_plus = (np.matrix)
 
 # compare r with inner products
 def comparison(function, r, flag):
