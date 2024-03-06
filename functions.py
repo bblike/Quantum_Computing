@@ -11,13 +11,16 @@ path = r"C:\Users\Li Zhejun\Desktop\Quantum_Computing\results\result.xls"
 
 
 # one time revolution at time t
-def evolution(phi, t):
-    inter_step = (np.matrix([[1, 0], [0, 1]]) - (0 + 1j) * paras.heff * t)
+def evolution(phi, t, h):
+    inter_step = (np.matrix([[1, 0], [0, 1]]) - (0 + 1j) * h * t)
     next_step = inter_step * phi
     return next_step
 
+
 def two_time_evolution(phi, t):
-    chi_plus = (np.matrix)
+    inter_step = (np.matrix([[1, 0], [0, 1]]) - (0 + 1j) * paras.H_0 * t)
+    next_step = inter_step * phi
+    return next_step
 
 # compare r with inner products
 def comparison(function, r, flag):
@@ -113,3 +116,45 @@ def write_excel_xls_add_sheet(sheet_name, array1, array2):
         add_sheets.write(i + 2, 2, '{}'.format(array2[i]))
 
     new_workbook.save(path)
+
+def brackmulti(mid, right):
+
+    left = np.transpose(right)
+
+    result = left*mid*right
+    return result
+
+
+"""test1 = brackmulti(paras.Sp, paras.up)
+print(test1)
+test2 = brackmulti(paras.Sm, paras.up)
+print(test2)
+test3 = brackmulti(paras.Sp, paras.down)
+print(test3)
+test4 = brackmulti(paras.Sm, paras.down)
+print(test4)"""
+
+# tries
+"""
+identity = np.matrix([[1,0], [0,1]])
+in_p = inner((identity + paras.Sm)*paras.up)
+in_m = inner((identity - paras.Sm)*paras.up)
+in_p1 = inner((identity + (0+1j) * paras.Sm)*paras.up)
+in_m1 = inner((identity - (0+1j) * paras.Sm)*paras.up)
+
+chi_p = (identity + paras.Sm)*paras.up/np.sqrt(in_p)
+chi_m = (identity - paras.Sm)*paras.up/np.sqrt(in_m)
+chi_p1 = (identity + (0+1j)* paras.Sm)*paras.up/np.sqrt(in_p1)
+chi_m1 = (identity + (0+1j)* paras.Sm)*paras.up/np.sqrt(in_m1)
+
+cpp = brackmulti(paras.Sp, chi_p)
+cpm = brackmulti(paras.Sp, chi_m)
+cpp1 = brackmulti(paras.Sp, chi_p1)
+cpm1 = brackmulti(paras.Sp, chi_m1)
+
+print(cpp, cpm, cpp1, cpm1)
+
+Ctotal = (np.conj(cpp) / np.sqrt(in_p)-np.conj(cpm) / np.sqrt(in_m) - (0+1j) * np.conj(cpp1) / np.sqrt(in_p1) + (0+1j) 
+    * np.conj(cpm1)/ np.sqrt(in_m1))/4
+print(Ctotal)
+"""

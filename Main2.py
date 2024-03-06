@@ -19,9 +19,9 @@ import multiprocessing as mp
 # random.seed(384756)
 y1 = paras.prob1
 finals = []
-n_cpu = 8
-n_particle = 20
-path = r"C:\Users\Li Zhejun\Desktop\Quantum_Computing\results\result.xls"
+n_cpu = 6
+n_particle = 100
+path = r"C:\Users\Li Zhejun\Desktop\Quantum_Computing\results"
 total_task = int(n_particle * paras.iteration)
 current_task = 0
 wow = r"""
@@ -53,59 +53,37 @@ wow = r"""
 """
 
 
-def one_complete_evolution(func1, func2, flag):  # function used for one evolution
-
+def one_complete_evolution(func1, func2):  # function used for one evolution
+    #print("func in one_complete_evolution, {}, {}".format(func1, func2))
     tracing = []
     function = np.matrix([[func1], [func2]])
-    result1 = func.evolution(function, paras.delt)
+    result1 = func.evolution(function, paras.delt, paras.H_0)
     r = random.random()
-    result, traced, flag = func.comparison(result1, r, flag)
+    result, traced, flag = func.comparison(result1, r, [0])
     tracing.append(traced)
-    return result, traced, flag  # result is the function, tracing is bool in 1/0 represent success or not
+    return result, traced # result is the function, tracing is bool in 1/0 represent success or not
 
 
-def one_particle():  # function for a particle in the whole time period
-    flag = []
-    flag_tracing = []
-    funcs = np.array(y1)
-    tracing1 = []
-    tracing = []
-    result = []
-    for i in range(0, int(paras.time / paras.delt)):
-        if i == 0:
-            result, tracing, flag = one_complete_evolution(funcs[i], funcs[i + 1], flag)
-        if i > 0:
-            result, tracing, flag = one_complete_evolution(funcs[0][i], funcs[1][i], flag)
-
-        result1 = np.array(result)
-        tracing1.append(np.array(tracing))
-        flag_tracing.append(flag)
-        funcs = np.c_[funcs, result1]
-
-    return funcs, tracing1, flag_tracing
-
-
-def task(q, n):
+def task(q, n, func1, func2):
     res = []
     flags = []
 
     for k in n:
         for i in k:
-            function, re, flag = one_particle()
-
-            if not flags:
+            function, re = one_complete_evolution(func1, func2)
+            print(re)
+            if not res:
                 res = re
-                flags = flag
             else:
                 for j in range(len(res)):
                     res[j] = res[j] + re[j]
                     # flags[j] = flags[j] + flag[j]
 
     # print("res = ", res)
-    q.put([res, flags])
+    q.put([res])
 
 
-def parallel():  # multi core processing
+def parallel(func1, func2):  # multi core processing
 
     q = mp.Queue()
     total = n_particle
@@ -114,15 +92,7 @@ def parallel():  # multi core processing
     chunk_size = int(total / n_cpu)
     print("Number of Core used: ", n_cpu)
     print("total task number: ", total_task)
-    est = total_task / n_cpu / 5000
-    est_m = int(est / 60)
-    est_h = int(est_m / 60)
-    est_m = est_m - est_h * 60
-    est_s = est - 60 * est_m - est_h * 3600
-    print("estimated time: {}h {}m {}s.".format(est_h, est_m, est_s))
-    begin = time.time()
-    now = datetime.now()
-    print("start time:", now)
+
     # distribute tasks
     for i in range(0, n_cpu):
         min_i = chunk_size * i
@@ -136,7 +106,7 @@ def parallel():  # multi core processing
             digits.append(digit)
         # print(digits)
         # print(len(digits))
-        procs.append(mp.Process(target=task, args=(q, [digits])))
+        procs.append(mp.Process(target=task, args=(q, [digits], func1, func2)))
     for proc in procs:
         proc.start()
     res = []
@@ -146,18 +116,30 @@ def parallel():  # multi core processing
                 res.append(q.get())
     for proc in procs:
         proc.join()
-    end = time.time() - begin
-    end_time = datetime.now()
-    end_m = int(end / 60)
-    end_h = int(end_m / 60)
-    end_m = end_m - end_h * 60
-    end_s = round(end - end_m * 60 - end_h * 3600, 1)
-    now = end_time
-    print("finish at :", end_time)
-    print("time spent = {}h {}m {}s".format(end_h, end_m, end_s))
 
-    return res, end, now
+    print(res)
 
+    return res
+
+def time_evolution(iteration, ):
+    flag = []
+    flag_tracing = []
+    funcs = np.array(y1)
+    tracing1 = []
+    tracing = []
+    result = []
+    for i in range(0, int(paras.time / paras.delt)):
+        if i == 0:
+            result = parallel(funcs[0], funcs[1])
+        if i > 0:
+            result = parallel(funcs[0][i], funcs[1][i])
+
+        result1 = np.array(result)
+        tracing1.append(np.array(tracing))
+        flag_tracing.append(flag)
+        funcs = np.c_[funcs, result1]
+
+    return 0
 
 def unpack(a):  # change the type of result
     new_list = []
@@ -191,7 +173,8 @@ def diff(a, b):  # calculate the percentage difference
 
 if __name__ == '__main__':
     print(wow)
-    final, times, now = parallel()
+    final, times, now_0 = time_evolution(paras.iteration)
+    now = now_0.strftime("%Y%m%d%H%M%S")
     finals = []
     finals2 = []
     for element in final:
@@ -225,6 +208,19 @@ if __name__ == '__main__':
     ax[0].legend()
     diffplot = diff(anapop[:-1], ys[:-1])
     ax[1].plot(xs[20:-1], diffplot[20:])
+    counter_001 = 0
+    counter_005 = 0
+    counter_010 = 0
+    for i in diffplot:
+        if np.abs(i) <= 0.01:
+            counter_001 += 1
+        if np.abs(i) <= 0.05:
+            counter_005 += 1
+        if np.abs(i) <= 0.10:
+            counter_010 += 1
+    per99 = counter_001 / len(diffplot)
+    per95 = counter_005 / len(diffplot)
+    per90 = counter_010 / len(diffplot)
 
     yline = np.zeros(len(xs[:-1]))
     yline += 0.01
@@ -236,7 +232,7 @@ if __name__ == '__main__':
     ax[1].set_title("Difference", size=30)
     ax[1].set_xlabel("Time", size=15)
     ax[1].set_ylabel("Percentage", size=15)
-    fig.savefig("t={}s,n_particle={}.png".format(round(paras.time, 1), n_particle))
+    fig.savefig("{}/{}.png".format(path, str(now)))
     fig.show()
 
     # plot the collapse time against time
@@ -249,19 +245,22 @@ if __name__ == '__main__':
     print(len(xs))
     print(len(new))
     plt.plot(xs, np.array(new))
-    plt.title("Single particle tracing for {} second-{}".format(round(paras.time, 0), str(now)))
+    plt.title("Single particle tracing-{}".format(str(now)))
     plt.xlabel("time/s")
     plt.ylabel("density function")
-    plt.savefig("SingleTracing.png")
+    plt.savefig("{}/S-{}.png".format(path, str(now)))
     plt.show()
 
     # generate excel table
-    array1 = ['number of particles']
-    array2 = [n_particle]
+    array1 = ['number of particles', '99% acceptance', '95% acceptance', '90% acceptance']
+    array2 = [n_particle, per99, per95, per90]
     array1.append("time")
     array2.append(str(now))
     terms, numbers = func.writearray(array1, array2)
 
-
-    #func.excelgenerator(terms, numbers)
-    func.write_excel_xls_add_sheet("test", array1, array2)
+    # func.excelgenerator(terms, numbers)
+    # func.write_excel_xls_add_sheet("{}".format(str(now)), terms, numbers)
+    print("***************")
+    print(per99)
+    print(per95)
+    print(per90)

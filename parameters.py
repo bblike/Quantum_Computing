@@ -5,7 +5,7 @@ import numpy as np
 
 #for single particle
 a, b = 1, 0
-det = -0.8                 #delta sign
+det = 0                 #delta sign
 rabi = 1                #omega sign
 Gamma = 0.1      #Gamma sign
 h = 6.626e-34           #planck constant
@@ -33,6 +33,18 @@ A = np.matrix([[det, rabi],
 B = np.matrix([[det, rabi],
                          [rabi, -det-(0+1j)*Gamma]])
 
+
+up = np.matrix([[1],[0]])
+down = np.matrix([[0],[1]])
+
+Sp = np.matrix([[1,0],[0,1]])
+Sm = np.matrix([[0,1],[1,0]])
+
+tau = 1
+# print(Sp)
+H_0 = rabi/2/np.pi*(Sp+Sm) - np.matrix([[0,1],[1,(0+1j)*Gamma*tau]])
+#print(H_0)
+#print(heff)
 
 
 

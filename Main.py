@@ -19,8 +19,8 @@ import multiprocessing as mp
 # random.seed(384756)
 y1 = paras.prob1
 finals = []
-n_cpu = 8
-n_particle = 1000
+n_cpu = 6
+n_particle = 100
 path = r"C:\Users\Li Zhejun\Desktop\Quantum_Computing\results"
 total_task = int(n_particle * paras.iteration)
 current_task = 0
@@ -56,7 +56,7 @@ def one_complete_evolution(func1, func2, flag):  # function used for one evoluti
 
     tracing = []
     function = np.matrix([[func1], [func2]])
-    result1 = func.evolution(function, paras.delt)
+    result1 = func.evolution(function, paras.delt, paras.H_0)
     r = random.random()
     result, traced, flag = func.comparison(result1, r, flag)
     tracing.append(traced)
@@ -278,7 +278,7 @@ if __name__ == '__main__':
     terms, numbers = func.writearray(array1, array2)
 
     #func.excelgenerator(terms, numbers)
-    func.write_excel_xls_add_sheet("{}".format(str(now)), terms, numbers)
+    #func.write_excel_xls_add_sheet("{}".format(str(now)), terms, numbers)
     print("***************")
     print(per99)
     print(per95)
